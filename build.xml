@@ -1,0 +1,201 @@
+<project name="Singleton" default="all">
+	<property name="src.dir" value="singleton"/>
+	<property name="envDir" value=".python3-sandbox"/>
+
+	<target name="env.check">
+		<condition property="env.exists">
+		  <available file="${envDir}" type="dir"/>
+		</condition>
+	</target>
+	
+	<target name="env" depends="env.check" unless="env.exists">
+		<exec executable="./environment.sh" />
+	</target>
+	
+	<target name="init" depends="env.check,env" if="env.exists">
+		<exec executable="./in_virtual_env" failonerror="true">
+			<arg value="./dependencies.sh"/>
+		</exec>
+	</target>
+	
+	<target name="test" depends="init">
+  		<path id="test.files">
+	    	<fileset dir="${src.dir}">
+	    	     <patternset>
+	    	          <include name="*_test.py"/>
+	    	     	  <include name="*.py"/>
+	    	     </patternset>
+	    	</fileset>
+  	    </path>
+	    <pathconvert pathsep="," property="testfiles" refid="test.files"/>
+	
+		<exec executable="./in_virtual_env" failonerror="true">
+			<arg value="coverage"/>
+			<arg value="run"/>
+      		<arg value="-p"/>
+	      	<arg value="--source=${testfiles}" />
+      		<arg value="-m" />
+			<arg value="py.test" />
+			<arg value="${src.dir}"/>
+			<arg value="-vv" />
+			<arg value="-s" />
+			<arg value="--junitxml=py.test.xml" />
+    	</exec>
+	</target>
+	
+	<target name="acceptance" depends="test"/>
+	  
+	<target name="coverage" depends="init">
+        <exec executable="./in_virtual_env" failonerror="true">
+        	<arg value="coverage"/>
+        	<arg value="combine"/>
+        </exec>
+        <exec executable="./in_virtual_env" failonerror="true">
+        	<arg value="coverage"/>
+        	<arg value="report"/>
+            <arg value="-m"/>
+        	<arg value="--omit=*_test.py,/usr/*,.python3-sandbox/*"/>
+        </exec>
+  		<exec executable="./in_virtual_env" failonerror="true">
+  			<arg value="coverage"/>
+  			<arg value="xml"/>
+            <arg value="--omit=*_test.py,/usr/*,.python3-sandbox/*"/>
+	    </exec>
+        <exec executable="./in_virtual_env" failonerror="true">
+        	<arg value="coverage"/>
+        	<arg value="erase"/>
+        </exec>
+	</target>
+	        
+	<target name="duplication" depends="init">
+  	    <property name="filelist.file" value=".filesToDedup"/>
+        <path id="clonedigger.files">
+        	<fileset dir="${src.dir}">
+	    	     <patternset>
+	    	          <include name="*_test.py"/>
+	    	     	  <include name="*.py"/>
+	    	     </patternset>
+	    	</fileset>
+        </path>
+        <pathconvert pathsep=" " property="clonediggerfiles" refid="clonedigger.files"/>
+        <echo file="${filelist.file}" message="${clonediggerfiles}"/>
+        
+        <exec executable="clonedigger" failonerror="true">
+        	<arg value="--distance-threshold=1"/> 
+          	<arg value="--file-list=${filelist.file}" />
+          	<arg value="--output=with_duplicate_analysis.html" />
+        </exec>
+	    <exec executable="/bin/rm">
+          	<arg value="${filelist.file}"/>
+        </exec>
+        <exec executable="python2" failonerror="true">
+        	<arg value="ensure_passing.py" />
+            <arg value="--build_step=duplication" />
+            <arg value="with_duplicate_analysis.html"/>
+        </exec>
+        <exec executable="/bin/rm">
+            <arg value="with_duplicate_analysis.html"/>
+        </exec>
+	</target>
+		
+	<target name="complexity" depends="init">
+        <apply executable="./in_virtual_env" parallel="true" failonerror="true">
+        	<arg value="radon"/>
+        	<arg value="cc"/> 
+          	<arg value="-s"/>
+          	<arg value="-nb"/>
+        	<fileset dir="${src.dir}">
+                    <patternset>
+                            <include name="**/*.py"/>   
+                    </patternset>
+            </fileset>
+        </apply>
+		<exec executable="/bin/rm">
+			<arg value="-f"/>
+			<arg value=".complexity.json"/>
+		</exec>
+	    <apply executable="./in_virtual_env" parallel="true" failonerror="true" output=".complexity.json">
+	    	<arg value="radon"/>
+	    	<arg value="cc"/> 
+	      	<arg value="-j"/>
+	    	<fileset dir="${src.dir}">
+	                <patternset>
+	                        <include name="**/*.py"/>   
+	                </patternset>
+	        </fileset>
+	    </apply>
+		<exec executable="python2" failonerror="true">
+			<arg value="ensure_passing.py" />
+	        <arg value="--build_step=complexity" />
+			<arg value="--threshold=7"/>
+	        <arg value=".complexity.json"/>
+		</exec>
+	</target>
+	  
+	<target name="test-coverage" depends="init,clean,test,coverage" />
+	
+	<target name="all" depends="init"/>
+	
+	<target name="clean">
+	  	<path id="temp.files">
+	    	<fileset dir=".">
+	    	     <patternset>
+	    	          <include name="singleton/*.pyc"/>
+			  		  <include name=".coverage*"/>
+	    	     </patternset>
+	    	</fileset>
+	    </path>
+	    <pathconvert pathsep=" " property="tempfiles" refid="temp.files"/>
+	  	<exec executable="/bin/rm">
+			<arg line= "-f ${tempfiles}"/>
+	    </exec>
+
+		<exec executable="/bin/rm">
+			<arg value="-f"/>
+			<arg value="with_duplicate_analysis.html"/>
+			<arg value="py.test.xml" />
+			<arg value="coverage.xml" />
+			<arg value="README.txt" />
+	        <arg value="MANIFEST" />
+			<arg value=".complexity.json"/>
+			<arg value=".filesToDedup"/>
+	    </exec>
+	  	<exec executable="/bin/rm">
+	  		<arg value="-rf"/>
+	  		<arg value="__pycache__/"/>
+	  		<arg value="${src.dir}/__pycache__/"/>
+	  		<arg value="${test.dir}/__pycache__/"/>
+	  		<arg value="dist" />
+	  		<arg value="Singleton.egg-info"/>
+	  		<arg value="scripts"/>
+	  	</exec>
+	</target>
+	<target name="package" depends="clean,package-remove">
+		<exec executable="./in_virtual_env">
+			<arg value="python3"/>
+			<arg value="setup.py"/>
+			<arg value="sdist"/>
+		</exec>
+		<path id="package.file">
+			<fileset dir="dist">
+				<patternset>
+					<include name="**/*.tar.gz"/>
+				</patternset>
+			</fileset>
+		</path>
+		<pathconvert pathsep="" property="packageToInstall" refid="package.file"/>
+		<exec executable="./in_virtual_env">
+			<arg value="pip3"/>
+			<arg value="install"/>
+			<arg value="${packageToInstall}"/>
+		</exec>
+	</target>
+	<target name="package-remove">
+		<exec executable="./in_virtual_env">
+			<arg value="pip3"/>
+			<arg value="uninstall"/>
+			<arg value="-y"/>
+			<arg value="Singleton"/>
+		</exec>
+	</target>
+</project>

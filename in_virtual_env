@@ -1,0 +1,2 @@
+#!/bin/bash
+source .python3-sandbox/bin/activate && $@
