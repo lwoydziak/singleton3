@@ -18,7 +18,7 @@ if os.path.exists('README.md'):
 
 #scripts = glob.glob("application/*")
 
-setup(name='Singleton',
+setup(name='singleton3',
       version='1.0',
       maintainer='Luke Woydziak',
       url = 'https://github.com/Pipe-s/Singleton',
@@ -34,7 +34,7 @@ setup(name='Singleton',
             'Topic :: Software Development :: Libraries :: Python Modules'
       ],
       packages=[
-                'singleton'
+                'singleton3'
                ]
 #       install_requires=[
 #                         "apache-libcloud",

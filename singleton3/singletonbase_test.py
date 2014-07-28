@@ -3,7 +3,7 @@ Created on May 15, 2012
 
 @author: lwoydziak
 '''
-from singleton import Singleton
+from singleton3 import Singleton
 
 class aSingleton(object, metaclass=Singleton):
     def __init__(self):

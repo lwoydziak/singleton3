@@ -1,5 +1,5 @@
 <project name="Singleton" default="all">
-	<property name="src.dir" value="singleton"/>
+	<property name="src.dir" value="singleton3"/>
 	<property name="envDir" value=".python3-sandbox"/>
 
 	<target name="env.check">
@@ -140,7 +140,7 @@
 	  	<path id="temp.files">
 	    	<fileset dir=".">
 	    	     <patternset>
-	    	          <include name="singleton/*.pyc"/>
+	    	          <include name="singleton3/*.pyc"/>
 			  		  <include name=".coverage*"/>
 	    	     </patternset>
 	    	</fileset>
@@ -166,7 +166,7 @@
 	  		<arg value="${src.dir}/__pycache__/"/>
 	  		<arg value="${test.dir}/__pycache__/"/>
 	  		<arg value="dist" />
-	  		<arg value="Singleton.egg-info"/>
+	  		<arg value="singleton3.egg-info"/>
 	  		<arg value="scripts"/>
 	  	</exec>
 	</target>
