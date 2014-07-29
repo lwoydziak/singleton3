@@ -1,4 +1,4 @@
-<project name="Singleton" default="all">
+<project name="singleton3" default="all">
 	<property name="src.dir" value="singleton3"/>
 	<property name="envDir" value=".python3-sandbox"/>
 
