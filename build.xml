@@ -195,7 +195,7 @@
 			<arg value="pip3"/>
 			<arg value="uninstall"/>
 			<arg value="-y"/>
-			<arg value="Singleton"/>
+			<arg value="singleton3"/>
 		</exec>
 	</target>
 </project>

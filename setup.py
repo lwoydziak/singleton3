@@ -4,7 +4,6 @@ Created on Jul 25, 2014
 @author: lwoydziak
 '''
 from setuptools import setup
-import glob
 import os
 
 def read(*rnames):
@@ -16,7 +15,6 @@ if os.path.exists('README.md'):
     import shutil
     shutil.copyfile('README.md', 'README.txt')
 
-#scripts = glob.glob("application/*")
 
 setup(name='singleton3',
       version='1.0',
@@ -36,11 +34,5 @@ setup(name='singleton3',
       packages=[
                 'singleton3'
                ]
-#       install_requires=[
-#                         "apache-libcloud",
-#                         "pexpect"
-#                        ],
-      #package_data={'infrastructure':['mycert.pem']},
-#       scripts=scripts
       )
 
