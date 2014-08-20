@@ -1,5 +1,8 @@
 #!/bin/bash
 
+scriptDir=`dirname $0`
+scriptDir=`readlink -f $scriptDir`
+
 PYTHON3=python3
 PYTHON2=python2
 
@@ -38,9 +41,9 @@ rm -f .pipPackageList
 
 rm -rf .python3-sandbox
 virtualenv -p python3 .python3-sandbox
-pip3_file=".python3-sandbox/bin/pip3"
-if [ ! -e "$pip3_file" ]
+pushd $scriptDir/.python3-sandbox/bin/
+if [ ! -e "pip3" ]
 then
-	ln -s .python3-sandbox/bin/pip*3* .python3-sandbox/bin/pip3
+        ln -s pip*3* pip3
 fi
-
+popd
