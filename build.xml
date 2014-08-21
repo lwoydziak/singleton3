@@ -198,4 +198,12 @@
 			<arg value="singleton3"/>
 		</exec>
 	</target>
+	<target name="package-deploy" depends="clean,package-remove">
+                <exec executable="./in_virtual_env">
+                        <arg value="python3"/>
+                        <arg value="setup.py"/>
+			<arg value="register"/>
+			<arg value="-r pypitest"/>
+                </exec>
+	</target>
 </project>
