@@ -19,6 +19,7 @@ if os.path.exists('README.md'):
 setup(name='singleton3',
       version='1.0',
       maintainer='Luke Woydziak',
+      maintainer_email='lwoydziak@gmail.com'
       url = 'https://github.com/Pipe-s/singleton3',
       platforms = ["any"],
       description = 'Python package for making object a Singleton.',
